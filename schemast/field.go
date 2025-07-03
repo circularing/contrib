@@ -46,9 +46,14 @@ func Field(desc *field.Descriptor) (*ast.CallExpr, error) {
 	case t == field.TypeJSON:
 		expr := "struct{}{}"
 		if desc.Info != nil && desc.Info.RType != nil {
-			expr = desc.Info.RType.Ident + "{}"
-			if desc.Info.RType.Kind == reflect.Pointer {
-				expr = "&" + expr
+			if desc.Info.RType.Kind == reflect.Slice {
+				expr = desc.Info.RType.Ident + "{}"
+			} else if desc.Info.RType.Kind == reflect.Map {
+				expr = desc.Info.RType.Ident + "{}"
+			} else if desc.Info.RType.Kind == reflect.Pointer {
+				expr = "&" + desc.Info.RType.Ident + "{}"
+			} else {
+				expr = desc.Info.RType.Ident + "{}"
 			}
 		}
 		exp, err := parser.ParseExpr(expr)
